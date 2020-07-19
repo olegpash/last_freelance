@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 start_now_position = (500, 1040)
 elements_position = (1091, 113)
 network_position = (1288, 113)
-div_position = (1018, 422)
+div_position = (1018, 426)
 answer_position = (815, 300)
 progress_position = (80, 1066)
 show_position = (150, 1050)
@@ -76,7 +76,7 @@ def smart_click(cmd, *time_t):
     if len(time_t) != 0:
         time_t = 5  # error
     else:
-        time_t = 0.35
+        time_t = 0.5
     if cmd == '':
         pass
     else:
@@ -212,23 +212,28 @@ def start_parsing_from_page(link, log_name):
     buffer = start_site()
     buffer = buffer.replace('<li class="ui-block-a"><button id="btnProgress" type="button" class="ui-link ui-btn ui-btn-b ui-state-disabled ui-btn-icon-left"><span class="ui-btn-inner"><span class="ui-icon ui-icon-grid">&nbsp;</span><span class="ui-btn-text">Progress</span><span id="qCounter">', '')
     buffer = buffer.replace('</span></span></button></li>', '').strip().split()
-    #count = int(buffer[2]) - int(buffer[0]) + 1
-    count = 5
+    count = int(buffer[2]) - int(buffer[0]) + 1
     for i in range(count):
         cycle(i, log_name)
     print(f'Page execution time: {time.time() - start_time} seconds.')
 
 
 def start():
+    with open('state_error.txt', 'a', encoding='utf-8') as log:
+        log.write('\n')
     hrefs, states = get_hrefs()
     for href in range(len(hrefs)):
-        links = parse_from_state(hrefs[href])
-        with open(states[href] + '.txt', 'w', encoding='utf-8') as log:
-            log.write("\n")
-        for link in links:
-            print(link, states[href])
-            start_parsing_from_page(link, states[href])
-
+        try:
+            links = parse_from_state(hrefs[href])
+            with open(states[href] + '.txt', 'w', encoding='utf-8') as log:
+                log.write("\n")
+            for link in links:
+                print(link, states[href])
+                start_parsing_from_page(link, states[href])
+        except Exception:
+            with open('state_error.txt', 'a', encoding='utf-8') as log:
+                log.write(states[href])
+                log.write('\n')
 
 time.sleep(5)
 start()
